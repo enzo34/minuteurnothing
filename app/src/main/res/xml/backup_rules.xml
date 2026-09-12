@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<full-backup-content xmlns:android="http://schemas.android.com/apk/res/android">
-    <include
-        android:domain="sharedpref"
-        android:path="." />
+<!-- Attributs sans préfixe android: ici, ce sont ceux du gestionnaire de sauvegarde. -->
+<full-backup-content>
+    <include domain="sharedpref" path="." />
 </full-backup-content>

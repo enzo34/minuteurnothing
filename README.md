@@ -55,6 +55,19 @@ Ouvrir le dossier dans **Android Studio** puis lancer *Run* sur le téléphone
 branché en USB (débogage USB activé). Android Studio télécharge seul le SDK
 nécessaire.
 
+Et si même le SDK Android est hors d'atteinte (réseau filtré, machine sans
+Android Studio) :
+
+```bash
+outils/construire_apk.sh     # → build-manuel/cachet45.apk
+```
+
+Ce script reconstruit l'APK sans SDK ni Gradle, en assemblant à la main une
+chaîne d'outils entièrement récupérée depuis Maven Central : `aapt2` et les
+ressources du framework extraits d'apktool, le dexeur `dx` d'AOSP, `apksig`
+pour la signature v2, et le `android.jar` complet publié par Robolectric.
+Il ne lui faut qu'un JDK 17, Python 3 et `curl`.
+
 ## Fonctionnement interne
 
 Volontairement sans service en arrière-plan ni thread : le décompte est

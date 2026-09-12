@@ -17,7 +17,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import java.util.Calendar
 import java.util.Date
 
@@ -94,8 +93,8 @@ class MainActivity : Activity() {
     // --- Interface -----------------------------------------------------------
 
     private fun majInterface() {
-        val blanc = ContextCompat.getColor(this, R.color.blanc)
-        val vert = ContextCompat.getColor(this, R.color.vert)
+        val blanc = getColor(R.color.blanc)
+        val vert = getColor(R.color.vert)
 
         when (Minuteur.etat(this)) {
             Etat.REPOS -> {
@@ -111,7 +110,7 @@ class MainActivity : Activity() {
             Etat.EN_COURS -> {
                 afficherMatrice(compteARebours(Minuteur.restantMs(this)), blanc)
                 sousMatrice.text = getString(R.string.restantes)
-                sousMatrice.setTextColor(ContextCompat.getColor(this, R.color.rouge))
+                sousMatrice.setTextColor(getColor(R.color.rouge))
                 consigne.text = getString(
                     R.string.consigne_en_cours_heure,
                     MinuteurWidget.heureDeFin(this)
@@ -196,7 +195,7 @@ class MainActivity : Activity() {
                 if (active) R.drawable.puce_active else R.drawable.puce_inactive
             )
             puce.setTextColor(
-                ContextCompat.getColor(this, if (active) R.color.noir else R.color.gris)
+                getColor(if (active) R.color.noir else R.color.gris)
             )
             puce.isSelected = active
         }

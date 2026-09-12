@@ -7,7 +7,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import androidx.core.content.ContextCompat
 import java.util.Date
 
 /**
@@ -55,10 +54,10 @@ class MinuteurWidget : AppWidgetProvider() {
 
         fun construire(contexte: Context): RemoteViews {
             val vues = RemoteViews(contexte.packageName, R.layout.widget_minuteur)
-            val blanc = ContextCompat.getColor(contexte, R.color.blanc)
-            val gris = ContextCompat.getColor(contexte, R.color.gris)
-            val rouge = ContextCompat.getColor(contexte, R.color.rouge)
-            val vert = ContextCompat.getColor(contexte, R.color.vert)
+            val blanc = contexte.getColor(R.color.blanc)
+            val gris = contexte.getColor(R.color.gris)
+            val rouge = contexte.getColor(R.color.rouge)
+            val vert = contexte.getColor(R.color.vert)
 
             when (Minuteur.etat(contexte)) {
                 Etat.REPOS -> {
