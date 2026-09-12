@@ -41,11 +41,13 @@ annuler. Le minuteur ne peut donc pas être remis à zéro par erreur.
 L'APK est reconstruit automatiquement à chaque modification du code
 (onglet **Actions** du dépôt).
 
-> **Si l'onglet Actions affiche « startup_failure » sans aucun job :** c'est que
-> le dépôt est privé. Sur un dépôt privé, GitHub facture les minutes
-> d'exécution, et rien ne démarre s'il n'en reste plus. Le plus simple est de
-> passer le dépôt en public (Settings → General → Change visibility), où Actions
-> est gratuit et illimité. À défaut, il reste la compilation locale ci-dessous.
+> **Si un job échoue en deux secondes, sans aucun journal :** aucune machine ne
+> lui a été attribuée, la compilation n'a donc jamais commencé. La raison exacte
+> s'affiche en bandeau rouge en haut de la page du run. Les deux causes
+> habituelles sont un dépôt privé (les minutes y sont facturées) — corrigé en
+> passant le dépôt en public — et un problème de facturation sur le compte, à
+> régler sur <https://github.com/settings/billing>. En attendant, la compilation
+> locale ci-dessous ne dépend de rien de tout cela.
 
 ### Sans passer par GitHub
 
