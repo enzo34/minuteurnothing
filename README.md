@@ -41,6 +41,18 @@ annuler. Le minuteur ne peut donc pas être remis à zéro par erreur.
 L'APK est reconstruit automatiquement à chaque modification du code
 (onglet **Actions** du dépôt).
 
+> **Si l'onglet Actions affiche « startup_failure » sans aucun job :** c'est que
+> le dépôt est privé. Sur un dépôt privé, GitHub facture les minutes
+> d'exécution, et rien ne démarre s'il n'en reste plus. Le plus simple est de
+> passer le dépôt en public (Settings → General → Change visibility), où Actions
+> est gratuit et illimité. À défaut, il reste la compilation locale ci-dessous.
+
+### Sans passer par GitHub
+
+Ouvrir le dossier dans **Android Studio** puis lancer *Run* sur le téléphone
+branché en USB (débogage USB activé). Android Studio télécharge seul le SDK
+nécessaire.
+
 ## Fonctionnement interne
 
 Volontairement sans service en arrière-plan ni thread : le décompte est

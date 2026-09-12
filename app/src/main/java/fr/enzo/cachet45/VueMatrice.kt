@@ -19,6 +19,7 @@ class VueMatrice @JvmOverloads constructor(
     /** Distance entre deux centres de points, en dp. */
     var pasDp: Float = 9f
         set(valeur) {
+            if (field == valeur) return
             field = valeur
             requestLayout()
             invalidate()

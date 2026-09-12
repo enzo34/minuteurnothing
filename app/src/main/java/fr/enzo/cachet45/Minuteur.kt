@@ -168,7 +168,8 @@ object Minuteur {
         val maintenant = System.currentTimeMillis()
         val minutes = minutesRestantes(contexte)
         if (minutes <= 1) return // la dernière minute est couverte par l'alarme de fin
-        val prochain = (fin - (minutes - 1) * 60_000L).coerceAtLeast(maintenant + 1_000L)
+        // 200 ms après la bascule, pour que le recalcul tombe bien sur la minute suivante.
+        val prochain = (fin - (minutes - 1) * 60_000L + 200L).coerceAtLeast(maintenant + 1_000L)
         val declencheur = intentionDiffusee(contexte, ACTION_TIC, CODE_TIC)
         try {
             gestionnaire.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, prochain, declencheur)

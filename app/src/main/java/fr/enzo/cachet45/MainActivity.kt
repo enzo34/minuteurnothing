@@ -45,15 +45,15 @@ class MainActivity : Activity() {
         super.onCreate(etatSauvegarde)
         setContentView(R.layout.activity_main)
 
-        boutonPrincipal = findViewById(R.id.bouton_principal)
-        matrice = findViewById(R.id.matrice)
-        sousMatrice = findViewById(R.id.sous_matrice)
-        consigne = findViewById(R.id.consigne)
-        boutonSecondaire = findViewById(R.id.bouton_secondaire)
-        titreDuree = findViewById(R.id.titre_duree)
-        ligneDurees = findViewById(R.id.ligne_durees)
-        dernierePrise = findViewById(R.id.derniere_prise)
-        boutonTuile = findViewById(R.id.bouton_tuile)
+        boutonPrincipal = findViewById<View>(R.id.bouton_principal)!!
+        matrice = findViewById<VueMatrice>(R.id.matrice)!!
+        sousMatrice = findViewById<TextView>(R.id.sous_matrice)!!
+        consigne = findViewById<TextView>(R.id.consigne)!!
+        boutonSecondaire = findViewById<TextView>(R.id.bouton_secondaire)!!
+        titreDuree = findViewById<TextView>(R.id.titre_duree)!!
+        ligneDurees = findViewById<LinearLayout>(R.id.ligne_durees)!!
+        dernierePrise = findViewById<TextView>(R.id.derniere_prise)!!
+        boutonTuile = findViewById<TextView>(R.id.bouton_tuile)!!
 
         boutonPrincipal.setOnClickListener {
             Minuteur.appuiPrincipal(this)
@@ -69,7 +69,7 @@ class MainActivity : Activity() {
             majInterface()
         }
 
-        findViewById<View>(R.id.bouton_widget).setOnClickListener { proposerWidget() }
+        findViewById<View>(R.id.bouton_widget)!!.setOnClickListener { proposerWidget() }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             boutonTuile.visibility = View.VISIBLE

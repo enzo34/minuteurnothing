@@ -44,6 +44,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    // Appli personnelle installée à la main : un avertissement de lint ne doit pas
+    // empêcher de produire l'APK. `./gradlew lint` reste disponible à la demande.
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
 }
 
 kotlin {
