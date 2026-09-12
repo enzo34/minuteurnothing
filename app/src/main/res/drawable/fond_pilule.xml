@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pilule anthracite façon widgets Nothing OS : le rayon est volontairement
+     énorme, Android le ramène à la moitié de la hauteur → forme de stade. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/anthracite" />
+    <corners android:radius="500dp" />
+</shape>

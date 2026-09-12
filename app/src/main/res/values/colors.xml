@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="noir">#FF000000</color>
+    <color name="blanc">#FFFFFFFF</color>
+    <color name="gris">#FF8A8A8A</color>
+    <color name="gris_fonce">#FF1C1C1C</color>
+    <color name="rouge">#FFD71921</color>
+    <color name="vert">#FF3BD671</color>
+    <!-- Le fond des pilules Nothing OS : anthracite très légèrement translucide. -->
+    <color name="anthracite">#F2242424</color>
+    <color name="anthracite_clair">#FF2E2E2E</color>
+    <color name="contour">#33FFFFFF</color>
+</resources>

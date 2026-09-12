@@ -1,0 +1,69 @@
+name: APK
+
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    name: Construire l'APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Préparer le SDK Android
+        uses: android-actions/setup-android@v3
+
+      - name: Mettre en cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle.kts', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-
+
+      - name: Compiler
+        run: ./gradlew --no-daemon --stacktrace assembleRelease
+
+      - name: Renommer l'APK
+        run: |
+          mkdir -p sortie
+          cp app/build/outputs/apk/release/app-release.apk "sortie/cachet45.apk"
+
+      - name: Déposer l'APK en artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cachet45-apk
+          path: sortie/cachet45.apk
+          if-no-files-found: error
+
+      - name: Publier la version téléchargeable
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          HORODATAGE=$(date -u +"%d/%m/%Y %H:%M UTC")
+          gh release delete derniere-version --yes --cleanup-tag || true
+          gh release create derniere-version sortie/cachet45.apk \
+            --title "Cachet 45 — dernière version" \
+            --notes "APK construit le $HORODATAGE depuis \`${{ github.ref_name }}\` (commit ${{ github.sha }}).
+
+          Téléchargez \`cachet45.apk\` depuis votre téléphone et ouvrez le fichier pour l'installer." \
+            --prerelease

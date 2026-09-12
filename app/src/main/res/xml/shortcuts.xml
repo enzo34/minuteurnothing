@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_pilule"
+        android:shortcutId="demarrer"
+        android:shortcutLongLabel="@string/raccourci_long"
+        android:shortcutShortLabel="@string/raccourci_court">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="fr.enzo.cachet45.DemarrageRapideActivity"
+            android:targetPackage="fr.enzo.cachet45" />
+    </shortcut>
+</shortcuts>
