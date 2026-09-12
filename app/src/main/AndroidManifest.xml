@@ -34,6 +34,12 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
+        <activity
+            android:name=".HistoriqueActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode" />
+
         <!-- Raccourci « démarrer » : aucune interface, démarre et se referme. -->
         <activity
             android:name=".DemarrageRapideActivity"

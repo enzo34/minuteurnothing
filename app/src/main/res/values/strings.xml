@@ -8,21 +8,58 @@
     <string name="consigne_repos">Appuyez juste après avoir avalé le cachet.</string>
     <string name="consigne_en_cours_heure">Ne rien manger ni boire jusqu\'à %1$s.</string>
     <string name="consigne_termine">Le délai est écoulé, vous pouvez manger et boire.</string>
-    <string name="minutes">minutes</string>
     <string name="restantes">restantes</string>
     <string name="termine">C\'est bon</string>
     <string name="annuler">Annuler</string>
     <string name="ok">OK</string>
+    <string name="supprimer">Supprimer</string>
     <string name="duree">Délai à respecter</string>
     <string name="duree_min">%1$d min</string>
-    <string name="derniere_prise">Dernière prise : %1$s</string>
-    <string name="jamais">aucune pour l\'instant</string>
-    <string name="aujourdhui">aujourd\'hui à %1$s</string>
-    <string name="hier">hier à %1$s</string>
-    <string name="le_jour">le %1$s à %2$s</string>
     <string name="ajouter_widget">Ajouter le widget à l\'écran d\'accueil</string>
     <string name="ajouter_tuile">Ajouter aux réglages rapides</string>
     <string name="widget_deja_present">Appui long sur l\'écran d\'accueil → Widgets → Cachet 45.</string>
+
+    <!-- Dernière prise et historique -->
+    <string name="derniere_prise">Dernière prise : %1$s à %2$s</string>
+    <string name="derniere_prise_aucune">Aucune prise enregistrée</string>
+    <string name="voir_historique">Voir l\'historique</string>
+    <string name="historique">Historique</string>
+    <string name="onglet_calendrier">Calendrier</string>
+    <string name="onglet_liste">Liste</string>
+    <string name="historique_vide">Aucune prise enregistrée pour l\'instant.</string>
+    <string name="choisir_un_jour">Touchez un jour pour voir le détail.</string>
+    <string name="aucune_prise_ce_jour">%1$s\nAucune prise ce jour-là.</string>
+    <string name="prise_heure_duree">%1$s · %2$d min</string>
+    <string name="prise_du">%1$s à %2$s</string>
+    <string name="supprimer_prise">Supprimer cette prise ?</string>
+    <string name="jour_aujourdhui">aujourd\'hui</string>
+    <string name="jour_hier">hier</string>
+    <string name="fleche_gauche">‹</string>
+    <string name="fleche_droite">›</string>
+    <string name="appui_long_supprimer">Appui long sur une ligne pour la supprimer.</string>
+
+    <plurals name="prises_enregistrees">
+        <item quantity="one">%d prise enregistrée</item>
+        <item quantity="other">%d prises enregistrées</item>
+    </plurals>
+    <plurals name="prises_ce_mois">
+        <item quantity="one">%d jour avec prise ce mois-ci</item>
+        <item quantity="other">%d jours avec prise ce mois-ci</item>
+    </plurals>
+
+    <!-- Sonnerie -->
+    <string name="sonnerie">Sonnerie de fin</string>
+    <string name="sonnerie_choisir">Sonneries du téléphone</string>
+    <string name="sonnerie_fichier">Choisir un fichier audio…</string>
+    <string name="sonnerie_ecouter">Écouter la sonnerie</string>
+    <string name="symbole_ecouter">▶</string>
+    <string name="symbole_arreter">■</string>
+    <string name="sonnerie_arreter">Arrêter l\'écoute</string>
+    <string name="sonnerie_titre_selecteur">Sonnerie de fin de délai</string>
+    <string name="sonnerie_defaut">Alarme par défaut</string>
+    <string name="sonnerie_aucune">Aucune</string>
+    <string name="sonnerie_actuelle">Sonnerie : %1$s</string>
+    <string name="sonnerie_illisible">Ce fichier n\'a pas pu être lu, sonnerie inchangée.</string>
 
     <!-- Widget -->
     <string name="widget_label">Cachet 45</string>

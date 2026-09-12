@@ -133,8 +133,101 @@ def ecran(x, y, w, h, gros, couleur_gros, sous, couleur_sous, consigne, bouton):
     return e
 
 
+def calendrier(x, y, w, jours_pris, jour_actuel, decalage, nb_jours):
+    """La grille du mois : un rond par jour, plein si le cachet a été pris."""
+    e = []
+    cellule = w / 7
+    rayon = cellule * 0.34
+    entete = 34
+    for colonne, initiale in enumerate("LMMJVSD"):
+        e.append(
+            '<text x="%.1f" y="%.1f" fill="%s" font-family="Helvetica,Arial,sans-serif" '
+            'font-size="13" letter-spacing="1.6" text-anchor="middle">%s</text>'
+            % (x + colonne * cellule + cellule / 2, y + 21, GRIS, initiale)
+        )
+    for jour in range(1, nb_jours + 1):
+        index = decalage + jour - 1
+        cx = x + (index % 7) * cellule + cellule / 2
+        cy = y + entete + (index // 7) * cellule + cellule / 2
+        pris = jour in jours_pris
+        if pris:
+            e.append('<circle cx="%.1f" cy="%.1f" r="%.1f" fill="%s"/>' % (cx, cy, rayon, BLANC))
+        else:
+            e.append(
+                '<circle cx="%.1f" cy="%.1f" r="%.1f" fill="none" stroke="#3A3A3A" '
+                'stroke-width="1.5"/>' % (cx, cy, rayon)
+            )
+        if jour == jour_actuel:
+            e.append(
+                '<circle cx="%.1f" cy="%.1f" r="%.1f" fill="none" stroke="%s" '
+                'stroke-width="1.5"/>' % (cx, cy, rayon + 5, ROUGE)
+            )
+        e.append(
+            '<text x="%.1f" y="%.1f" fill="%s" font-family="Helvetica,Arial,sans-serif" '
+            'font-size="15" text-anchor="middle">%d</text>'
+            % (cx, cy + 5, NOIR if pris else GRIS, jour)
+        )
+    hauteur = entete + ((decalage + nb_jours + 6) // 7) * cellule
+    return e, hauteur
+
+
+def ecran_historique(x, y, w, h):
+    e = [
+        '<rect x="%d" y="%d" width="%d" height="%d" rx="46" fill="%s"/>' % (x, y, w, h, NOIR),
+        etiquette("Historique", x + 34, y + 62, GRIS, taille=14),
+        '<text x="%.1f" y="%.1f" fill="%s" font-family="Helvetica,Arial,sans-serif" '
+        'font-size="19">128 prises enregistrées</text>' % (x + 34, y + 94, BLANC),
+    ]
+    for index, (libelle, actif) in enumerate((("Calendrier", True), ("Liste", False))):
+        largeur_puce = 132 if actif else 88
+        px = x + 34 + (0 if index == 0 else 146)
+        e.append(
+            '<rect x="%.1f" y="%.1f" width="%d" height="48" rx="24" fill="%s"/>'
+            % (px, y + 124, largeur_puce, BLANC if actif else ANTHRACITE)
+        )
+        e.append(
+            '<text x="%.1f" y="%.1f" fill="%s" font-family="Helvetica,Arial,sans-serif" '
+            'font-size="17" text-anchor="middle">%s</text>'
+            % (px + largeur_puce / 2, y + 155, NOIR if actif else GRIS, libelle)
+        )
+
+    carte_y = y + 196
+    grille_x = x + 44
+    grille_l = w - 88
+    grille, hauteur_grille = calendrier(
+        grille_x, carte_y + 74, grille_l,
+        {1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29, 30},
+        30, 1, 30,
+    )
+    hauteur_carte = 74 + hauteur_grille + 26
+    e.append(
+        '<rect x="%.1f" y="%.1f" width="%d" height="%.1f" rx="44" fill="%s"/>'
+        % (x + 30, carte_y, w - 60, hauteur_carte, ANTHRACITE)
+    )
+    e.append(etiquette("‹", x + 58, carte_y + 46, BLANC, taille=20))
+    e.append(etiquette("Septembre 2026", x + w / 2, carte_y + 44, BLANC,
+                       ancre="middle", taille=14))
+    e.append(etiquette("›", x + w - 58, carte_y + 46, BLANC, ancre="end", taille=20))
+    e += grille
+
+    bas = carte_y + hauteur_carte + 42
+    e.append(etiquette("22 jours avec prise ce mois-ci", x + w / 2, bas, GRIS,
+                       ancre="middle", taille=13))
+    e.append(
+        '<text x="%.1f" y="%.1f" fill="%s" font-family="Helvetica,Arial,sans-serif" '
+        'font-size="17" text-anchor="middle">Mercredi 30 septembre</text>'
+        % (x + w / 2, bas + 40, BLANC)
+    )
+    e.append(
+        '<text x="%.1f" y="%.1f" fill="%s" font-family="Helvetica,Arial,sans-serif" '
+        'font-size="17" text-anchor="middle">07:12 · 45 min</text>'
+        % (x + w / 2, bas + 70, BLANC)
+    )
+    return e
+
+
 def construire():
-    largeur, hauteur = 1020, 980
+    largeur, hauteur = 1500, 980
     e = [
         '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" '
         'viewBox="0 0 %d %d">' % (largeur, hauteur, largeur, hauteur),
@@ -166,6 +259,9 @@ def construire():
         ["Appuyez juste après avoir", "avalé le cachet."],
         None,
     )
+
+    e.append(etiquette("Historique", 1020, 62, GRIS, taille=16))
+    e += ecran_historique(1020, 92, 424, 830)
 
     e.append("</svg>")
     return "\n".join(e)

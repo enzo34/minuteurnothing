@@ -14,7 +14,11 @@ anthracite, gros chiffres en matrice de points, petites capitales espacées.
 - **Un appui sur le widget** = le minuteur démarre. Rien d'autre à faire.
 - Le widget affiche les **minutes restantes** et **l'heure à laquelle vous pourrez manger**.
 - Une notification silencieuse décompte dans la barre d'état.
-- À la fin : **sonnerie d'alarme + vibration**, « C'est bon, vous pouvez manger ».
+- À la fin : **sonnerie + vibration**, « C'est bon, vous pouvez manger ».
+- **Sonnerie au choix** : une alarme du téléphone ou n'importe quel fichier
+  audio, avec un bouton pour l'écouter avant de la retenir.
+- **Journal des prises**, consultable en **calendrier** (un rond plein par jour
+  où le cachet a été pris) ou en **liste** groupée par mois.
 - Délai réglable : 30, 45 ou 60 minutes (45 par défaut).
 - Le minuteur survit au redémarrage du téléphone et à la veille profonde.
 
@@ -76,9 +80,18 @@ entièrement porté par l'horloge système.
 - `Minuteur` — démarrage, annulation, fin. L'échéance est posée avec
   `AlarmManager.setAlarmClock()`, la seule variante qu'Android ne repousse
   jamais, même en veille profonde ou en économie d'énergie.
-- `Reglages` — l'état tient dans quatre valeurs (`SharedPreferences`) : début,
-  fin, durée choisie, dernière prise. L'état courant se déduit de l'heure de fin
-  comparée à l'heure actuelle, donc rien ne peut se désynchroniser.
+- `Reglages` — l'état du minuteur tient dans quelques valeurs
+  (`SharedPreferences`) : début, fin, durée choisie, sonnerie. L'état courant se
+  déduit de l'heure de fin comparée à l'heure actuelle, donc rien ne peut se
+  désynchroniser.
+- `Historique` — le journal des prises, en JSON dans les mêmes préférences. Une
+  prise par jour pendant dix ans tient dans moins de 200 Ko : une base de
+  données serait disproportionnée. Annuler dans les deux premières minutes
+  efface la prise (fausse manœuvre) ; annuler plus tard la conserve, puisque le
+  cachet, lui, a bien été pris.
+- `Sonneries` — Android fige le son d'un canal de notification à sa création :
+  en changer impose d'en recréer un neuf, d'où le numéro de version dans son
+  identifiant et le ménage des canaux devenus inutiles.
 - `Matrice` / `VueMatrice` — les chiffres en points. La police NDot de Nothing
   n'étant pas redistribuable, chaque glyphe est dessiné sur une grille de 5×7
   vrais cercles, réutilisée pour le widget (bitmap), l'écran principal (canvas)

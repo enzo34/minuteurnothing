@@ -11,8 +11,8 @@ import android.view.View
 class VueMatrice @JvmOverloads constructor(
     contexte: Context,
     attributs: AttributeSet? = null,
-    style: Int = 0
-) : View(contexte, attributs, style) {
+    styleParDefaut: Int = 0
+) : View(contexte, attributs, styleParDefaut) {
 
     private val peinture = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE }
 

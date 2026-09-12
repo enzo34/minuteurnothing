@@ -46,10 +46,15 @@ object Minuteur {
     fun minutesRestantes(contexte: Context): Int =
         ((restantMs(contexte) + 59_999L) / 60_000L).toInt()
 
+    /** En deçà, une annulation est traitée comme une fausse manœuvre. */
+    private const val FAUSSE_MANOEUVRE_MS = 120_000L
+
     fun demarrer(contexte: Context) {
         val maintenant = System.currentTimeMillis()
-        val fin = maintenant + Reglages.dureeMin(contexte) * 60_000L
-        Reglages.enregistrerPrise(contexte, maintenant, fin)
+        val duree = Reglages.dureeMin(contexte)
+        val fin = maintenant + duree * 60_000L
+        Reglages.demarrerMinuteur(contexte, maintenant, fin)
+        Historique.ajouter(contexte, Prise(maintenant, duree))
         programmerAlarme(contexte, fin)
         programmerTic(contexte)
         Notifications.afficherEnCours(contexte, fin)
@@ -64,7 +69,16 @@ object Minuteur {
         if (etat(contexte) == Etat.EN_COURS) programmerTic(contexte)
     }
 
+    /**
+     * Annuler tout de suite signifie « je me suis trompé de bouton » : la prise
+     * est retirée du journal. Annuler plus tard signifie « j'arrête le décompte »,
+     * et le cachet, lui, a bien été pris : la prise reste enregistrée.
+     */
     fun annuler(contexte: Context) {
+        val debut = Reglages.debutA(contexte)
+        if (debut > 0L && System.currentTimeMillis() - debut < FAUSSE_MANOEUVRE_MS) {
+            Historique.supprimer(contexte, debut)
+        }
         annulerAlarme(contexte)
         annulerTic(contexte)
         Reglages.effacerMinuteur(contexte)

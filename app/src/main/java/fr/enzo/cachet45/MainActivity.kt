@@ -5,20 +5,20 @@ import android.app.Activity
 import android.app.StatusBarManager
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Icon
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.format.DateFormat
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import java.util.Calendar
-import java.util.Date
 
 class MainActivity : Activity() {
 
@@ -30,6 +30,8 @@ class MainActivity : Activity() {
     private lateinit var titreDuree: TextView
     private lateinit var ligneDurees: LinearLayout
     private lateinit var dernierePrise: TextView
+    private lateinit var sonnerieActuelle: TextView
+    private lateinit var boutonEcouter: TextView
     private lateinit var boutonTuile: TextView
 
     private val boucle = Handler(Looper.getMainLooper())
@@ -52,6 +54,8 @@ class MainActivity : Activity() {
         titreDuree = findViewById<TextView>(R.id.titre_duree)!!
         ligneDurees = findViewById<LinearLayout>(R.id.ligne_durees)!!
         dernierePrise = findViewById<TextView>(R.id.derniere_prise)!!
+        sonnerieActuelle = findViewById<TextView>(R.id.sonnerie_actuelle)!!
+        boutonEcouter = findViewById<TextView>(R.id.bouton_sonnerie_ecouter)!!
         boutonTuile = findViewById<TextView>(R.id.bouton_tuile)!!
 
         boutonPrincipal.setOnClickListener {
@@ -66,6 +70,23 @@ class MainActivity : Activity() {
                 Etat.REPOS -> Unit
             }
             majInterface()
+        }
+
+        findViewById<View>(R.id.carte_derniere_prise)!!.setOnClickListener {
+            startActivity(Intent(this, HistoriqueActivity::class.java))
+        }
+
+        findViewById<View>(R.id.bouton_sonnerie_systeme)!!.setOnClickListener {
+            ouvrir(Sonneries.intentionSelecteur(this), DEMANDE_SONNERIE)
+        }
+
+        findViewById<View>(R.id.bouton_sonnerie_fichier)!!.setOnClickListener {
+            ouvrir(Sonneries.intentionFichier(), DEMANDE_FICHIER)
+        }
+
+        boutonEcouter.setOnClickListener {
+            if (Sonneries.enLecture()) Sonneries.arreter() else Sonneries.ecouter(this)
+            majSonnerie()
         }
 
         findViewById<View>(R.id.bouton_widget)!!.setOnClickListener { proposerWidget() }
@@ -88,6 +109,7 @@ class MainActivity : Activity() {
     override fun onPause() {
         super.onPause()
         boucle.removeCallbacks(rafraichissement)
+        Sonneries.arreter()
     }
 
     // --- Interface -----------------------------------------------------------
@@ -134,8 +156,9 @@ class MainActivity : Activity() {
         }
 
         boutonPrincipal.contentDescription = "${sousMatrice.text} — ${matrice.texte}"
-        dernierePrise.text = getString(R.string.derniere_prise, texteDernierePrise())
+        dernierePrise.text = texteDernierePrise()
         majDurees()
+        majSonnerie()
     }
 
     /** Adapte la taille des points pour que le texte remplisse le cercle. */
@@ -149,6 +172,15 @@ class MainActivity : Activity() {
     private fun compteARebours(restantMs: Long): String {
         val totalSecondes = (restantMs + 999L) / 1000L
         return String.format("%02d:%02d", totalSecondes / 60, totalSecondes % 60)
+    }
+
+    private fun texteDernierePrise(): String {
+        val prise = Historique.derniere(this) ?: return getString(R.string.derniere_prise_aucune)
+        return getString(
+            R.string.derniere_prise,
+            Dates.jourRelatif(this, prise.debut),
+            Dates.heure(this, prise.debut)
+        )
     }
 
     // --- Durées --------------------------------------------------------------
@@ -194,34 +226,55 @@ class MainActivity : Activity() {
             puce.setBackgroundResource(
                 if (active) R.drawable.puce_active else R.drawable.puce_inactive
             )
-            puce.setTextColor(
-                getColor(if (active) R.color.noir else R.color.gris)
-            )
+            puce.setTextColor(getColor(if (active) R.color.noir else R.color.gris))
             puce.isSelected = active
         }
     }
 
-    // --- Dernière prise ------------------------------------------------------
+    // --- Sonnerie ------------------------------------------------------------
 
-    private fun texteDernierePrise(): String {
-        val horodatage = Reglages.dernierePrise(this)
-        if (horodatage == 0L) return getString(R.string.jamais)
+    private fun majSonnerie() {
+        sonnerieActuelle.text = getString(R.string.sonnerie_actuelle, Sonneries.nom(this))
+        val enLecture = Sonneries.enLecture()
+        boutonEcouter.text =
+            getString(if (enLecture) R.string.symbole_arreter else R.string.symbole_ecouter)
+        boutonEcouter.contentDescription =
+            getString(if (enLecture) R.string.sonnerie_arreter else R.string.sonnerie_ecouter)
+    }
 
-        val heure = DateFormat.getTimeFormat(this).format(Date(horodatage))
-        val jourPrise = Calendar.getInstance().apply { timeInMillis = horodatage }
-        val aujourdhui = Calendar.getInstance()
+    private fun ouvrir(intention: Intent, code: Int) {
+        try {
+            startActivityForResult(intention, code)
+        } catch (_: Exception) {
+            Toast.makeText(this, R.string.sonnerie_illisible, Toast.LENGTH_LONG).show()
+        }
+    }
 
-        val memeAnnee = jourPrise.get(Calendar.YEAR) == aujourdhui.get(Calendar.YEAR)
-        val ecartJours = jourPrise.get(Calendar.DAY_OF_YEAR) - aujourdhui.get(Calendar.DAY_OF_YEAR)
+    override fun onActivityResult(requete: Int, resultat: Int, donnees: Intent?) {
+        super.onActivityResult(requete, resultat, donnees)
+        if (resultat != RESULT_OK) return
+        when (requete) {
+            DEMANDE_SONNERIE ->
+                Sonneries.definir(this, sonnerieChoisie(donnees), persistable = false)
 
-        return when {
-            memeAnnee && ecartJours == 0 -> getString(R.string.aujourdhui, heure)
-            memeAnnee && ecartJours == -1 -> getString(R.string.hier, heure)
-            else -> getString(
-                R.string.le_jour,
-                DateFormat.getDateFormat(this).format(Date(horodatage)),
-                heure
+            DEMANDE_FICHIER -> {
+                val adresse = donnees?.data ?: return
+                Sonneries.definir(this, adresse, persistable = true)
+            }
+        }
+        majInterface()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun sonnerieChoisie(donnees: Intent?): Uri? {
+        if (donnees == null) return null
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            donnees.getParcelableExtra(
+                RingtoneManager.EXTRA_RINGTONE_PICKED_URI,
+                Uri::class.java
             )
+        } else {
+            donnees.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
         }
     }
 
@@ -257,5 +310,8 @@ class MainActivity : Activity() {
         /** Largeur disponible pour les points à l'intérieur du cercle, en dp. */
         const val LARGEUR_UTILE_DP = 182f
         const val PAS_MAX_DP = 14f
+
+        const val DEMANDE_SONNERIE = 10
+        const val DEMANDE_FICHIER = 11
     }
 }

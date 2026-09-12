@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.media.AudioAttributes
-import android.media.RingtoneManager
 
 /**
  * Uniquement des API du framework : l'appli n'a ainsi aucune dépendance
@@ -17,7 +16,15 @@ import android.media.RingtoneManager
 object Notifications {
 
     private const val CANAL_EN_COURS = "minuteur_en_cours"
-    private const val CANAL_TERMINE = "minuteur_termine"
+    private const val PREFIXE_CANAL_TERMINE = "minuteur_termine_v"
+
+    /**
+     * Android fige le son d'un canal à sa création. Changer de sonnerie impose
+     * donc d'abandonner le canal courant pour un neuf, d'où la version dans
+     * l'identifiant.
+     */
+    private fun canalTermine(contexte: Context) =
+        PREFIXE_CANAL_TERMINE + Reglages.versionCanal(contexte)
 
     private const val ID_EN_COURS = 1
     private const val ID_TERMINE = 2
@@ -43,18 +50,17 @@ object Notifications {
             setSound(null, null)
         }
 
+        val identifiantTermine = canalTermine(contexte)
         val termine = NotificationChannel(
-            CANAL_TERMINE,
+            identifiantTermine,
             contexte.getString(R.string.canal_termine),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = contexte.getString(R.string.canal_termine_desc)
             enableVibration(true)
             vibrationPattern = longArrayOf(0, 400, 200, 400, 200, 700)
-            val son = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
             setSound(
-                son,
+                Sonneries.uri(contexte),
                 AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -64,7 +70,18 @@ object Notifications {
 
         gestionnaire.createNotificationChannel(enCours)
         gestionnaire.createNotificationChannel(termine)
+
+        // Les canaux des sonneries précédentes n'ont plus lieu d'être, et
+        // encombreraient les réglages du téléphone.
+        gestionnaire.notificationChannels
+            .filter {
+                it.id.startsWith(PREFIXE_CANAL_TERMINE) && it.id != identifiantTermine
+            }
+            .forEach { gestionnaire.deleteNotificationChannel(it.id) }
     }
+
+    /** Appelé après un changement de sonnerie. */
+    fun reconstruireCanaux(contexte: Context) = creerCanaux(contexte)
 
     private fun ouvrirAppli(contexte: Context): PendingIntent = PendingIntent.getActivity(
         contexte,
@@ -115,7 +132,7 @@ object Notifications {
         creerCanaux(contexte)
         val acquitter =
             Minuteur.intentionDiffusee(contexte, Minuteur.ACTION_ACQUITTER, CODE_ACQUITTER)
-        val notification = Notification.Builder(contexte, CANAL_TERMINE)
+        val notification = Notification.Builder(contexte, canalTermine(contexte))
             .setSmallIcon(R.drawable.ic_pilule)
             .setContentTitle(contexte.getString(R.string.notif_termine_titre))
             .setContentText(contexte.getString(R.string.notif_termine_texte))
